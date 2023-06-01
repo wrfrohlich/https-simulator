@@ -1,12 +1,13 @@
 from sys import argv
 from random import randint
 from hashlib import sha256
-from Crypto.Cipher import AES
-from utils import dec_to_hex, hex_to_byte, byte_to_hex
+from Cryptodome.Cipher import AES
+from utils import dec_to_hex, hex_to_bytes, byte_to_hex
 
 class HttpsSimulator():
     def __init__(self):
-        self.key_size = 128
+        self.iv_size = 128 #bits
+        self.key_size = 128 #bits
         self.p = "%s%s%s%s%s%s%s%s" % ( "B10B8F96A080E01DDE92DE5EAE5D54EC",
                                         "52C99FBCFB06A3C69A6A9DCA52D23B61",
                                         "6073E28675A23D189838EF1E2EE652C0",
@@ -62,7 +63,7 @@ class HttpsSimulator():
 
     def mount_dict(self, value: int)-> dict:
         value_hex = dec_to_hex(value)
-        value_bytes = hex_to_byte(value_hex)
+        value_bytes = hex_to_bytes(value_hex)
         value_dict = {'dec': value, 'hex': value_hex, 'bytes': value_bytes}
         return value_dict
 
@@ -107,7 +108,7 @@ class HttpsSimulator():
 
     def get_n_bits(self, S, bits):
         size = int(bits/8)
-        S = hex_to_byte(S)
+        S = hex_to_bytes(S)
         S = S[:size]
         return S
 
@@ -116,6 +117,16 @@ class HttpsSimulator():
         S = self.calculate_sha256(V_gen[1])
         S = self.get_n_bits(S, self.key_size)
         return byte_to_hex(S)
+
+    def message_decode(self, key, iv_size):
+        iv_size = int(iv_size/8)
+        msg = hex_to_bytes(self.MSG)
+        key = hex_to_bytes(key)
+        iv = msg[:iv_size]
+        msg = msg[iv_size:]
+        cipher = AES.new(key, AES.MODE_CBC, iv)
+        return cipher.decrypt(msg).decode('utf-8')
+
 
 if __name__ == '__main__':
     https_simulator = HttpsSimulator()
@@ -128,4 +139,8 @@ if __name__ == '__main__':
             https_simulator.report(argv[1], "A (hex): %s" % (ret[2]))
             https_simulator.report(argv[1], "\n")
         else:
-            print(https_simulator.generate_key())
+            key = https_simulator.generate_key()
+            print(key)
+            msg = https_simulator.message_decode(key, https_simulator.iv_size)
+            print(msg)
+

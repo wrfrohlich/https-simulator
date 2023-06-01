@@ -3,7 +3,7 @@ from binascii import unhexlify
 def dec_to_hex(value: int)-> hex:
     return hex(value)
 
-def hex_to_byte(value: str)-> bytes:
+def hex_to_bytes(value: str)-> bytes:
     '''
     Convert the value from hex to byte
 
