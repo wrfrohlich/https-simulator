@@ -1,9 +1,12 @@
-
 from sys import argv
 from random import randint
+from hashlib import sha256
+from Crypto.Cipher import AES
+from utils import dec_to_hex, hex_to_byte, byte_to_hex
 
 class HttpsSimulator():
     def __init__(self):
+        self.key_size = 128
         self.p = "%s%s%s%s%s%s%s%s" % ( "B10B8F96A080E01DDE92DE5EAE5D54EC",
                                         "52C99FBCFB06A3C69A6A9DCA52D23B61",
                                         "6073E28675A23D189838EF1E2EE652C0",
@@ -57,6 +60,12 @@ class HttpsSimulator():
                                         "4C1D93DC79FEB7D8CFB309CED2A4FF23",
                                         "F090952BBC9CC28DCAF1677FBB3291DF")
 
+    def mount_dict(self, value: int)-> dict:
+        value_hex = dec_to_hex(value)
+        value_bytes = hex_to_byte(value_hex)
+        value_dict = {'dec': value, 'hex': value_hex, 'bytes': value_bytes}
+        return value_dict
+
     def generate_A(self, a = None):
         a = self.generate_random_a()
         a = int(a)
@@ -66,14 +75,6 @@ class HttpsSimulator():
         A_hex = hex(A_dec)[2:].upper()
         return a, A_dec, A_hex
 
-    def generate_V(self):
-        a = int(self.a, 16)
-        B = int(self.B, 16)
-        p = int(self.p, 16)
-        V_dec = pow(B, a, p)
-        V_hex = hex(V_dec)[2:].upper()
-        return V_dec, V_hex
-    
     def generate_random_a(self):
         a = 0
         for _ in range(1000):
@@ -90,6 +91,32 @@ class HttpsSimulator():
                 f.write("%s\n" % text)
                 print(text)
 
+    def generate_V(self):
+        a = int(self.a, 16)
+        B = int(self.B, 16)
+        p = int(self.p, 16)
+        V_dec = pow(B, a, p)
+        V_hex = hex(V_dec)[2:].upper()
+        return V_dec, V_hex
+
+    def calculate_sha256(self, V):
+        V = bytes.fromhex(V)
+        S = sha256(V)
+        S = S.hexdigest()
+        return S
+
+    def get_n_bits(self, S, bits):
+        size = int(bits/8)
+        S = hex_to_byte(S)
+        S = S[:size]
+        return S
+
+    def generate_key(self):
+        V_gen = self.generate_V()
+        S = self.calculate_sha256(V_gen[1])
+        S = self.get_n_bits(S, self.key_size)
+        return byte_to_hex(S)
+
 if __name__ == '__main__':
     https_simulator = HttpsSimulator()
     args = None
@@ -101,4 +128,4 @@ if __name__ == '__main__':
             https_simulator.report(argv[1], "A (hex): %s" % (ret[2]))
             https_simulator.report(argv[1], "\n")
         else:
-            print(https_simulator.generate_V())
+            print(https_simulator.generate_key())
