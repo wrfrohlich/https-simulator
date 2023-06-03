@@ -27,6 +27,7 @@ class HttpsSimulator():
                                         "D662A4D18E73AFA32D779D5918D08BC8",
                                         "858F4DCEF97C2A24855E6EEB22B3B2E5")
 
+    def custom_values(self):
         self.a = "%s%s%s%s%s%s%s%s" % ( "d7ea9337c772e836e5113f8bb89f6629",
                                         "822ba3efb5bef3dcf4727b0f964bcbbc",
                                         "6b503fbeceab1aa545a7f64d2af406db",
@@ -36,7 +37,7 @@ class HttpsSimulator():
                                         "977c89c83fe11b22f882e2175d17dc6b",
                                         "86fbb91e7873c0d132c8757675")
 
-        self.A = "%s%s%s%s%s%s%s%s" % ( "7020D292C8173E88F90EB6656133CA33",
+        self.Aa = "%s%s%s%s%s%s%s%s" % ("7020D292C8173E88F90EB6656133CA33",
                                         "DB931DBDE43AFE844D8CFFCC50947363",
                                         "AA8530FD429C3F29ED38C91DDDBFC1FB",
                                         "7D239573EBC372331AA89292B2E12AB6",
@@ -45,7 +46,7 @@ class HttpsSimulator():
                                         "6899DFDDD76D41B7117E84250AD37770",
                                         "1BF82351FBFFE6021D461B095C4A4496")
 
-        self.B = "%s%s%s%s%s%s%s%s" % ( "6465FF74501E724583AE76A9E0DCCBDF",
+        self.Bb = "%s%s%s%s%s%s%s%s" % ("6465FF74501E724583AE76A9E0DCCBDF",
                                         "BE4A646DF0193A42031B3F958EEE4FF7",
                                         "A9AA6A1C8A90F52F5C3FC76D0670C71D",
                                         "ABA32849FE89DD2DDCE11B15CD790C97",
@@ -54,7 +55,7 @@ class HttpsSimulator():
                                         "1B9F358D7EA2DDAE2B8FCA64FB242F1C",
                                         "D89DDA853F89D9CFE45B9CDA285C6952")
 
-        self.MSG = "%s%s%s%s%s%s%s" %("ABBDE81FFF5F4FC4740A5BD391B441CB",
+        self.MSG = "%s%s%s%s%s%s%s" %(  "ABBDE81FFF5F4FC4740A5BD391B441CB",
                                         "2BC4A45FDCFFF4EA73C19C5E5804C5F9",
                                         "8DF745F74AC71E366B695932A88DF44F",
                                         "B7A95DB96BE4989A37FE68D12AF2EB84",
@@ -68,58 +69,48 @@ class HttpsSimulator():
         value_dict = {'dec': value, 'hex': value_hex, 'bytes': value_bytes}
         return value_dict
 
-    def generate_A(self, a = None):
+    def generate_random_a(self, size: int = 1024)-> int:
+        a = 0
+        for _ in range(size):
+            a = (a << 1) | randint(0, 1)
+        return a
+
+    def generate_A(self, a: str = None)-> tuple:
         a = self.generate_random_a()
         a = int(a)
         g = int(self.g, 16)
         p = int(self.p, 16)
-        A_dec = pow(g, a, p)
-        A_hex = hex(A_dec)[2:].upper()
-        return a, A_dec, A_hex
+        Aa = pow(g, a, p)
+        Aa = hex(Aa)[2:].upper()
+        return a, Aa
 
-    def generate_random_a(self):
-        a = 0
-        for _ in range(1000):
-            a = (a << 1) | randint(0, 1)
-        return a
-
-    def report(self, file, text):
-        if file == "stage1":
-            with open("./results/stage1.txt", "a+") as f:
-                f.write("%s\n" % text)
-                print(text)
-        else:
-            with open("./results/stage2.txt", "a+") as f:
-                f.write("%s\n" % text)
-                print(text)
-
-    def generate_V(self):
+    def generate_V(self, a: str = None)-> str:
         a = int(self.a, 16)
-        B = int(self.B, 16)
+        Bb = int(self.Bb, 16)
         p = int(self.p, 16)
-        V_dec = pow(B, a, p)
-        V_hex = hex(V_dec)[2:].upper()
-        return V_dec, V_hex
+        Vv = pow(Bb, a, p)
+        Vv = hex(Vv)[2:].upper()
+        return Vv
 
-    def calculate_sha256(self, V):
-        V = bytes.fromhex(V)
-        S = sha256(V)
-        S = S.hexdigest()
-        return S
+    def calculate_sha256(self, Vv: str)-> str:
+        Vv = hex_to_bytes(Vv)
+        Ss = sha256(Vv)
+        Ss = Ss.hexdigest()
+        return Ss
 
-    def get_n_bits(self, S, bits):
+    def get_n_bits(self, Ss: str, bits: int)-> bytes:
         size = int(bits/8)
-        S = hex_to_bytes(S)
-        S = S[:size]
-        return S
+        Ss = hex_to_bytes(Ss)
+        Ss = Ss[:size]
+        return Ss
 
-    def generate_key(self):
-        V_gen = self.generate_V()
-        S = self.calculate_sha256(V_gen[1])
-        S = self.get_n_bits(S, self.key_size)
-        return byte_to_hex(S)
+    def generate_key(self)-> str:
+        Vv = self.generate_V()
+        Ss = self.calculate_sha256(Vv)
+        Ss = self.get_n_bits(Ss, self.key_size)
+        return byte_to_hex(Ss)
 
-    def message_decode(self, key, ciphertext, iv_size):
+    def decrypt(self, key, ciphertext: str, iv_size: int)-> str:
         iv_size = int(iv_size/8)
         msg = hex_to_bytes(ciphertext)
         key = hex_to_bytes(key)
@@ -128,7 +119,7 @@ class HttpsSimulator():
         cipher = AES.new(key, AES.MODE_CBC, iv)
         return cipher.decrypt(msg).decode('utf-8')
 
-    def encrypt(self, key, plaintext, iv_size):
+    def encrypt(self, key, plaintext: str, iv_size: int)-> str:
         iv_size = int(iv_size/8)
         pad = iv_size - len(plaintext) % iv_size
         plaintext += pad * chr(pad)
@@ -141,8 +132,18 @@ class HttpsSimulator():
         ciphertext = "%s%s" % (iv, ciphertext)
         return ciphertext
 
-    def custom_plaintext(self, plaintext):
+    def custom_plaintext(self, plaintext: str)-> str:
         return plaintext[::-1]
+
+    def report(self, file: str, text: str)-> None:
+        if file == "stage1":
+            with open("./results/stage1.txt", "a+") as f:
+                f.write("%s\n" % text)
+                print(text)
+        else:
+            with open("./results/stage2.txt", "a+") as f:
+                f.write("%s\n" % text)
+                print(text)
 
 if __name__ == '__main__':
     https_simulator = HttpsSimulator()
@@ -151,16 +152,18 @@ if __name__ == '__main__':
         if argv[1] == "stage1":
             ret = https_simulator.generate_A(args)
             https_simulator.report(argv[1], "a : %s" % (ret[0]))
-            https_simulator.report(argv[1], "A (dec): %s" % (ret[1]))
-            https_simulator.report(argv[1], "A (hex): %s" % (ret[2]))
+            https_simulator.report(argv[1], "A (hex): %s" % (ret[1]))
             https_simulator.report(argv[1], "\n")
         else:
-            key = https_simulator.generate_key()
-            plaintext = https_simulator.message_decode(key, https_simulator.MSG, https_simulator.iv_size)
-            print(plaintext)
-            plaintext = https_simulator.custom_plaintext(plaintext)
-            msg = https_simulator.encrypt(key, plaintext, https_simulator.iv_size)
-            print(msg)
-            plaintext = https_simulator.message_decode(key, msg, https_simulator.iv_size)
-            print(plaintext)
+            pass
+    else:
+        https_simulator.custom_values()
+        key = https_simulator.generate_key()
+        plaintext = https_simulator.decrypt(key, https_simulator.MSG, https_simulator.iv_size)
+        print(plaintext)
+        plaintext = https_simulator.custom_plaintext(plaintext)
+        msg = https_simulator.encrypt(key, plaintext, https_simulator.iv_size)
+        print(msg)
+        plaintext = https_simulator.decrypt(key, msg, https_simulator.iv_size)
+        print(plaintext)
 
