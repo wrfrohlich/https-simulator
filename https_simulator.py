@@ -1,6 +1,7 @@
 from sys import argv
 from random import randint
 from hashlib import sha256
+from Cryptodome import Random
 from Cryptodome.Cipher import AES
 from utils import dec_to_hex, hex_to_bytes, byte_to_hex
 
@@ -118,15 +119,30 @@ class HttpsSimulator():
         S = self.get_n_bits(S, self.key_size)
         return byte_to_hex(S)
 
-    def message_decode(self, key, iv_size):
+    def message_decode(self, key, ciphertext, iv_size):
         iv_size = int(iv_size/8)
-        msg = hex_to_bytes(self.MSG)
+        msg = hex_to_bytes(ciphertext)
         key = hex_to_bytes(key)
         iv = msg[:iv_size]
         msg = msg[iv_size:]
         cipher = AES.new(key, AES.MODE_CBC, iv)
         return cipher.decrypt(msg).decode('utf-8')
 
+    def encrypt(self, key, plaintext, iv_size):
+        iv_size = int(iv_size/8)
+        pad = iv_size - len(plaintext) % iv_size
+        plaintext += pad * chr(pad)
+        iv = Random.new().read(iv_size)
+        key = hex_to_bytes(key)
+        cipher = AES.new(key, AES.MODE_CBC, iv)
+        ciphertext = cipher.encrypt(plaintext.encode())
+        ciphertext = byte_to_hex(ciphertext)
+        iv = byte_to_hex(iv)
+        ciphertext = "%s%s" % (iv, ciphertext)
+        return ciphertext
+
+    def custom_plaintext(self, plaintext):
+        return plaintext[::-1]
 
 if __name__ == '__main__':
     https_simulator = HttpsSimulator()
@@ -140,7 +156,11 @@ if __name__ == '__main__':
             https_simulator.report(argv[1], "\n")
         else:
             key = https_simulator.generate_key()
-            print(key)
-            msg = https_simulator.message_decode(key, https_simulator.iv_size)
+            plaintext = https_simulator.message_decode(key, https_simulator.MSG, https_simulator.iv_size)
+            print(plaintext)
+            plaintext = https_simulator.custom_plaintext(plaintext)
+            msg = https_simulator.encrypt(key, plaintext, https_simulator.iv_size)
             print(msg)
+            plaintext = https_simulator.message_decode(key, msg, https_simulator.iv_size)
+            print(plaintext)
 
