@@ -1,0 +1,39 @@
+Key: FB36172D74CDA0C9C239BC440CA861D6
+Received plaintext: Legal Willaim. Agora inverte esta frase e me envia ele de volta cifrada com a mesma chave
+Delivered ciphertext : 941321C1E2957BD4E66F15980F2A6324BB6D3EE2F6514B7C2A1A87F4CD9A2836B49944666568F3A69FEFA295606033E687A74E95320744DE75573690674447439D1CE66853454EA9C51AC821B0FFC21411E52070126D0ED80DEF8000E2CD36601F8775199FD809E472B6DF87E8481208
+Delivered plaintext : evahc amsem a moc adarfic atlov ed ele aivne em e esarf atse etrevni arogA .mialliW lageL
+
+
+Delivered plaintext : Perfeito. Agora comenta bem o código colocando este exemplo completo como comentário no início do código e submete o código no Moodle
+
+
+Delivered plaintext : Perfeito. Agora comenta bem o código colocando este exemplo completo como comentário no início do código e submete o código no Moodle
+
+
+Delivered plaintext : Perfeito. Agora comenta bem o código colocando este exemplo completo como comentário no início do código e submete o código no Moodle
+
+
+Delivered ciphertext : Certo, muito obrigado! Estou achando a disciplina muito interessante. Pretendo fazer cripto avançada se abrir remoto semestre que vem
+Delivered plaintext : Perfeito. Agora comenta bem o código colocando este exemplo completo como comentário no início do código e submete o código no Moodle
+
+
+Delivered ciphertext : 482A4AD90FF23142071DA08DDAECED640878820ED61D4490DE9C7C6BC80B186D7F19E7C5E4FCC4BE6D09261E1095197B1F1C27F6F65D47F92E3D15872E7D70C0685E19167C3ED617E625AA58B9C58495EFB60686E82CFC4C41EB8D69E8F365EB6BF177B107418ED6FC778FA1BF336AEE15664B373C5BDDE8EAE62E96AAED622C4A30289FD5D2B01EE5B7F1B7C221BC0BD6874EB9669C50F70A5FA2559F5EDFA5
+Delivered plaintext : Certo, muito obrigado! Estou achando a disciplina muito interessante. Pretendo fazer cripto avançada se abrir remoto semestre que vem
+
+
+Delivered plaintext : Perfeito. Agora comenta bem o código colocando este exemplo completo como comentário no início do código e submete o código no Moodle
+
+
+Delivered ciphertext : 8F7C71F8D4A3987DEA9A926D34C11E88EADE72169424A24D174D1F14D75371BD659864A2B507C02A72E059ED8CE6796D7922AE40B3F88CCC84FA15919674E5B1E45A4996CEF3FBB289A374DCB7F08CA9E780C73DCE6183E65A9506845349140347C89DD29FBDBED90F7FD7ACBB8C2C80B92403EA0E974C57254F24DFFDB33C98D040018C31E11E93307037C9BC1BC86E8A08B225C08B05DCE9F008CFA6F580E3
+Delivered plaintext : hehehe show. Eu me divirto nesta disciplina. Bom descanso
+
+
+Delivered plaintext : Perfeito. Agora comenta bem o código colocando este exemplo completo como comentário no início do código e submete o código no Moodle
+
+
+Delivered ciphertext : 746E0B51789F8AD4B1345464F241C3DF341CD964916F5375B5B0204D0C576589530BB7821061E7E98DFF07FE8067B5E5EA63946ECC7ABAB1A399FA21B8AB1556D71F75C115B6C5CF5275ECBDE80B13278A0802EB07C46B5DFEFF6744CD84833FB696639E863601AA0773EF1509A06F011166D9AA7A4EBEE76DFBC14E94E0D512886538DF914318016475FC6D002C5829E252E2A620C0C91A00E24EB4BE3DEE3E
+Delivered plaintext : hehehe show. Eu me divirto nesta disciplina. Bom descanso
+Delivered ciphertext : B791064503C5233BC133A4704654E4B0EACD57C86EA8F98848E57BD3FAF28FB1FC1A4B35AB5491827E0C067DB8B9251EE98F788B623AA584503958790D9C8AB6763BDCECEB2BE5C0E1772831941D46D7
+Delivered plaintext : Sim, imagino. De fato é bem divertida. Obrigado e igualmente!
+
+

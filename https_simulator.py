@@ -3,6 +3,7 @@ from random import randint
 from hashlib import sha256
 from Cryptodome import Random
 from Cryptodome.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
 from utils import dec_to_hex, hex_to_bytes, byte_to_hex
 
 class HttpsSimulator():
@@ -63,6 +64,23 @@ class HttpsSimulator():
                                         "4C1D93DC79FEB7D8CFB309CED2A4FF23",
                                         "F090952BBC9CC28DCAF1677FBB3291DF")
 
+        self.MSG2 =  "%s%s%s%s%s%s%s%s%s%s" % ( "0D058E92ECED6AA2DBB52769055A71F3",
+                                                "25569FEFDACA754AAAE4B25AF8E4691A",
+                                                "CAD7233F877334201086C3511009E4EA",
+                                                "B0D5F70A997EDDAD118C434B6EA83745",
+                                                "403F85589F98A9AA7D4D5856D81FCB46",
+                                                "D560E90E5A611B3BFE2F8B46904CE142",
+                                                "1199D0BA3915272F2DFE1E66696CF04B",
+                                                "20B45795EFD0B6DFDFF80BECF4CC521A",
+                                                "B28ADD643CB2597F4992725D00AA7CE8",
+                                                "0B0E039A516BDEDDB05D5FD58943B222")
+
+        self.MSG3 =  "%s%s%s%s%s" % (   "581112A2A049AE3CE079C01E21BBB905",
+                                        "E46A295F8803737261F8989E575DF4E7",
+                                        "DCB427FD1FFAFF1569D006FBAE6E63CC",
+                                        "FAFB0E9FC14FC6ABF7AF57E1D3BAD52A",
+                                        "C34E41CC8C722DC36E5F222231268871")
+
     def mount_dict(self, value: int)-> dict:
         value_hex = dec_to_hex(value)
         value_bytes = hex_to_bytes(value_hex)
@@ -117,20 +135,22 @@ class HttpsSimulator():
         iv = msg[:iv_size]
         msg = msg[iv_size:]
         cipher = AES.new(key, AES.MODE_CBC, iv)
-        return cipher.decrypt(msg).decode('utf-8')
+        cipher = cipher.decrypt(msg)
+        cipher = unpad(cipher, iv_size).decode('utf-8')
+        return cipher
 
     def encrypt(self, key, plaintext: str, iv_size: int)-> str:
         iv_size = int(iv_size/8)
-        pad = iv_size - len(plaintext) % iv_size
-        plaintext += pad * chr(pad)
+        plaintext = plaintext.encode('utf-8')
+        plaintext = pad(plaintext, iv_size)
         iv = Random.new().read(iv_size)
         key = hex_to_bytes(key)
         cipher = AES.new(key, AES.MODE_CBC, iv)
-        ciphertext = cipher.encrypt(plaintext.encode())
+        ciphertext = cipher.encrypt(plaintext)
         ciphertext = byte_to_hex(ciphertext)
         iv = byte_to_hex(iv)
         ciphertext = "%s%s" % (iv, ciphertext)
-        return ciphertext
+        return ciphertext.upper()
 
     def custom_plaintext(self, plaintext: str)-> str:
         return plaintext[::-1]
@@ -159,11 +179,19 @@ if __name__ == '__main__':
     else:
         https_simulator.custom_values()
         key = https_simulator.generate_key()
+        https_simulator.report("stage2", "Key: %s" % (key.upper()))
         plaintext = https_simulator.decrypt(key, https_simulator.MSG, https_simulator.iv_size)
-        print(plaintext)
+        https_simulator.report("stage2", "Received plaintext: %s" % (plaintext))
         plaintext = https_simulator.custom_plaintext(plaintext)
         msg = https_simulator.encrypt(key, plaintext, https_simulator.iv_size)
-        print(msg)
+        https_simulator.report("stage2", "Delivered ciphertext : %s" % (msg))
+        plaintext = https_simulator.decrypt(key, msg, https_simulator.iv_size)
+        https_simulator.report("stage2", "Delivered plaintext : %s" % (plaintext))
+        https_simulator.report("stage2", "\n")
+
+
+
+
         plaintext = https_simulator.decrypt(key, msg, https_simulator.iv_size)
         print(plaintext)
 
