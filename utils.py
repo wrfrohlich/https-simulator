@@ -3,6 +3,9 @@ from binascii import unhexlify
 def dec_to_hex(value: int)-> hex:
     return hex(value)
 
+def hex_to_dec(value: str)-> hex:
+    return int(value, 16)
+
 def hex_to_bytes(value: str)-> bytes:
     '''
     Convert the value from hex to byte

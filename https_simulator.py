@@ -29,6 +29,11 @@ class HttpsSimulator():
                                         "858F4DCEF97C2A24855E6EEB22B3B2E5")
 
     def custom_values(self):
+        """
+        Customized values as a requirement for the Cryptography class at
+        PUCRS (Pontifical Catholic University of Rio Grande do Sul),
+        taught by Professor Avelino Zorzo.
+        """
         self.a = "%s%s%s%s%s%s%s%s" % ( "d7ea9337c772e836e5113f8bb89f6629",
                                         "822ba3efb5bef3dcf4727b0f964bcbbc",
                                         "6b503fbeceab1aa545a7f64d2af406db",
@@ -56,6 +61,8 @@ class HttpsSimulator():
                                         "1B9F358D7EA2DDAE2B8FCA64FB242F1C",
                                         "D89DDA853F89D9CFE45B9CDA285C6952")
 
+        """Legal Willaim. Agora inverte esta frase e me envia ele de volta cifrada 
+        com a mesma chave"""
         self.MSG = "%s%s%s%s%s%s%s" %(  "ABBDE81FFF5F4FC4740A5BD391B441CB",
                                         "2BC4A45FDCFFF4EA73C19C5E5804C5F9",
                                         "8DF745F74AC71E366B695932A88DF44F",
@@ -64,6 +71,8 @@ class HttpsSimulator():
                                         "4C1D93DC79FEB7D8CFB309CED2A4FF23",
                                         "F090952BBC9CC28DCAF1677FBB3291DF")
 
+        """Perfeito. Agora comenta bem o código colocando este exemplo completo como
+        comentário no início do código e submete o código no Moodle"""
         self.MSG2 =  "%s%s%s%s%s%s%s%s%s%s" % ( "0D058E92ECED6AA2DBB52769055A71F3",
                                                 "25569FEFDACA754AAAE4B25AF8E4691A",
                                                 "CAD7233F877334201086C3511009E4EA",
@@ -75,60 +84,136 @@ class HttpsSimulator():
                                                 "B28ADD643CB2597F4992725D00AA7CE8",
                                                 "0B0E039A516BDEDDB05D5FD58943B222")
 
+        """hehehe show. Eu me divirto nesta disciplina. Bom descanso"""
         self.MSG3 =  "%s%s%s%s%s" % (   "581112A2A049AE3CE079C01E21BBB905",
                                         "E46A295F8803737261F8989E575DF4E7",
                                         "DCB427FD1FFAFF1569D006FBAE6E63CC",
                                         "FAFB0E9FC14FC6ABF7AF57E1D3BAD52A",
                                         "C34E41CC8C722DC36E5F222231268871")
 
-    def mount_dict(self, value: int)-> dict:
-        value_hex = dec_to_hex(value)
-        value_bytes = hex_to_bytes(value_hex)
-        value_dict = {'dec': value, 'hex': value_hex, 'bytes': value_bytes}
-        return value_dict
+    def generate_random_a(self, size: int = 1024)-> str:
+        """
+        Random 'a' value generator, default 1024
 
-    def generate_random_a(self, size: int = 1024)-> int:
+        Args:
+            size (int): Size of 'a' and bits.
+
+        Return:
+            'a' randomly generated in hex.
+        """
         a = 0
         for _ in range(size):
             a = (a << 1) | randint(0, 1)
-        return a
+        return dec_to_hex(a)
 
     def generate_A(self, a: str = None)-> tuple:
-        a = self.generate_random_a()
-        a = int(a)
-        g = int(self.g, 16)
-        p = int(self.p, 16)
-        Aa = pow(g, a, p)
+        """
+        Generates 'A' based on a value of 'a' received as a parameter or automatically
+        generated
+
+        Args:
+            a (str): Value of a, can be passed or automatically generated randomly.
+
+        Return:
+            'A' value generated.
+        """
+        if a == None:
+            a = self.generate_random_a()
+        a_ = dec_to_hex(a, 16)
+        g = dec_to_hex(self.g, 16)
+        p = dec_to_hex(self.p, 16)
+        Aa = pow(g, a_, p)
         Aa = hex(Aa)[2:].upper()
         return a, Aa
 
-    def generate_V(self, a: str = None)-> str:
-        a = int(self.a, 16)
-        Bb = int(self.Bb, 16)
+    def generate_V(self, a: str = None, Bb: str = None)-> str:
+        """
+        Generates the value of 'V' for Key generation, based on the value of 'a' and the
+        value of 'B' received from the other point.
+
+        Args:
+            a (str): String in hexadecimal.
+            Bb (str): String in hexadecimal received from the other point where you 
+                want to establish secure communication.
+
+        Return:
+            'V' value generated.
+        """
+        if a == None:
+            a = int(self.a, 16)
+        else:
+            a = int(a, 16)
+        if Bb == None:
+            Bb = int(self.Bb, 16)
+        else:
+            Bb = int(Bb, 16)
         p = int(self.p, 16)
         Vv = pow(Bb, a, p)
         Vv = hex(Vv)[2:].upper()
         return Vv
 
     def calculate_sha256(self, Vv: str)-> str:
+        """
+        Performs the SHA256 operation based on the generated V value
+
+        Args:
+            Vv (str): Value of V used to generate the key.
+
+        Return:
+            Key used to encrypt and decrypt.
+        """
         Vv = hex_to_bytes(Vv)
         Ss = sha256(Vv)
         Ss = Ss.hexdigest()
         return Ss
 
-    def get_n_bits(self, Ss: str, bits: int)-> bytes:
+    def get_n_bits(self, Ss: str, bits: int = 128)-> bytes:
+        """
+        Gets a specified number of bytes (received as bits) from a string in hexadecimal
+
+        Args:
+            Ss (str): string to get 'n' bytes.
+            bits (int): Number of bits you want to get from the text (will be treated
+                as bytes) - Default = 128.
+
+        Return:
+            String in bytes with 'n' bits received as a parameter (bits).
+        """
         size = int(bits/8)
         Ss = hex_to_bytes(Ss)
         Ss = Ss[:size]
         return Ss
 
-    def generate_key(self)-> str:
-        Vv = self.generate_V()
+    def generate_key(self, a: str = None, Bb: str = None)-> str:
+        """
+        Key generator used in the encryption and decryption process to establish
+        communication
+
+        Args:
+            a (str): String in hexadecimal.
+            Bb (str): String in hexadecimal received from the other point where you 
+                want to establish secure communication.
+
+        Return:
+            String in hexadecimal used as key.
+        """
+        Vv = self.generate_V(a, Bb)
         Ss = self.calculate_sha256(Vv)
         Ss = self.get_n_bits(Ss, self.key_size)
         return byte_to_hex(Ss)
 
-    def decrypt(self, key, ciphertext: str, iv_size: int)-> str:
+    def decrypt(self, key: str, ciphertext: str, iv_size: int = 128)-> str:
+        """
+        Decrypt using AES with CBC mode of operation
+
+        Args:
+            key (str): Key used for encryption/decryption.
+            ciphertext (str): Encrypted text.
+            iv_size (int): IV size used in encryption.
+
+        Return:
+            String with plaintext.
+        """
         iv_size = int(iv_size/8)
         msg = hex_to_bytes(ciphertext)
         key = hex_to_bytes(key)
@@ -139,7 +224,18 @@ class HttpsSimulator():
         cipher = unpad(cipher, iv_size).decode('utf-8')
         return cipher
 
-    def encrypt(self, key, plaintext: str, iv_size: int)-> str:
+    def encrypt(self, key: str, plaintext: str, iv_size: int = 128)-> str:
+        """
+        Encrypt using AES with CBC mode of operation
+
+        Args:
+            key (str): Key used for encryption/decryption.
+            plaintext (str): Text you want to encrypt.
+            iv_size (int): IV size used in encryption.
+
+        Return:
+            Received text string encrypted using AES in hexadecimal.
+        """
         iv_size = int(iv_size/8)
         plaintext = plaintext.encode('utf-8')
         plaintext = pad(plaintext, iv_size)
@@ -153,9 +249,28 @@ class HttpsSimulator():
         return ciphertext.upper()
 
     def custom_plaintext(self, plaintext: str)-> str:
+        """
+        Invert received text
+
+        Args:
+            plaintext (str): Any string.
+
+        Return:
+            The string received with the characters reversed (back to front).
+        """
         return plaintext[::-1]
 
     def report(self, file: str, text: str)-> None:
+        """
+        Performs the report of the information generated by the algorithm.
+
+        Args:
+            file (str): File where you want to store the report.
+            text (str): Text of the report
+
+        Return:
+            None
+        """
         if file == "stage1":
             with open("./results/stage1.txt", "a+") as f:
                 f.write("%s\n" % text)
@@ -167,20 +282,37 @@ class HttpsSimulator():
 
 if __name__ == '__main__':
     https_simulator = HttpsSimulator()
-    args = None
-    if len(argv) > 1:
+    args = len(argv)
+    if args > 1:
         if argv[1] == "stage1":
-            ret = https_simulator.generate_A(args)
+            ret = https_simulator.generate_A()
             https_simulator.report(argv[1], "a : %s" % (ret[0]))
             https_simulator.report(argv[1], "A (hex): %s" % (ret[1]))
             https_simulator.report(argv[1], "\n")
+        elif argv[1] == "key":
+            if args < 4:
+                exit("Please enter 'a' and 'B'")
+            key = https_simulator.generate_key(argv[2], argv[3])
+            print(key.upper())
+        elif argv[1] == "decrypt":
+            if args < 4:
+                exit("Please enter key and message")
+            plaintext = https_simulator.decrypt(argv[2], argv[3])
+            print(plaintext)
+        elif argv[1] == "encrypt":
+            if args < 4:
+                exit("Please enter key and message")
+            plaintext = ' '.join(argv[3:args])
+            ciphertext = https_simulator.encrypt(argv[2], plaintext)
+            print(ciphertext.upper())
         else:
-            pass
+            exit("Unrecognized option")
     else:
         https_simulator.custom_values()
         key = https_simulator.generate_key()
         https_simulator.report("stage2", "Key: %s" % (key.upper()))
-        plaintext = https_simulator.decrypt(key, https_simulator.MSG, https_simulator.iv_size)
+        plaintext = https_simulator.decrypt(key, https_simulator.MSG,
+                                            https_simulator.iv_size)
         https_simulator.report("stage2", "Received plaintext: %s" % (plaintext))
         plaintext = https_simulator.custom_plaintext(plaintext)
         msg = https_simulator.encrypt(key, plaintext, https_simulator.iv_size)
@@ -188,10 +320,3 @@ if __name__ == '__main__':
         plaintext = https_simulator.decrypt(key, msg, https_simulator.iv_size)
         https_simulator.report("stage2", "Delivered plaintext : %s" % (plaintext))
         https_simulator.report("stage2", "\n")
-
-
-
-
-        plaintext = https_simulator.decrypt(key, msg, https_simulator.iv_size)
-        print(plaintext)
-
